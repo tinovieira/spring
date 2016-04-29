@@ -50,7 +50,7 @@ public class TextController {
         }
 
         // executor service
-        ExecutorService executor = Executors.newFixedThreadPool(8);
+        ExecutorService executor = Executors.newWorkStealingPool();
         List<Future<ComputationResult>> results = new ArrayList<>(pEnd - pStart);
 
         // thread pool executor
