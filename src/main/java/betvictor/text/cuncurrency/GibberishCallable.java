@@ -78,12 +78,12 @@ public class GibberishCallable implements Callable<ComputationResult> {
 
         result.setNumParagraphs(paragraphs.size());
 
-        log.debug("P" + paragraph + " Time processing " + paragraphs.size() + " paragraph(s): " + result.getNumParagraphs());
-        log.debug("P" + paragraph + " Total words processed: " + result.getTotalWords());
+        log.info("P" + paragraph + " Time processing " + paragraphs.size() + " paragraph(s): " + result.getNumParagraphs());
+        log.info("P" + paragraph + " Total words processed: " + result.getTotalWords());
 
         SortedSet<Word> sortedWords = new TreeSet<>(result.getCountMap().values());
 
-        log.debug("P" + paragraph + " Most frequent word: " + sortedWords.first().getWord() +
+        log.info("P" + paragraph + " Most frequent word: " + sortedWords.first().getWord() +
                 " repeated " + sortedWords.first().getCount() + " time(s)");
 
         result.setTotalTimeProcessingParagraphs(System.currentTimeMillis() - startTimeParagraph);
