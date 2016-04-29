@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -29,6 +30,9 @@ public class TextController {
 
     @Autowired
     private TextDao textDao;
+
+    @Value("${gibberish.url}")
+    private String gibberishUrl;
 
     @Value("${service.history.showLast}")
     private int showHistoryLast;
@@ -50,8 +54,9 @@ public class TextController {
         List<Future<ComputationResult>> results = new ArrayList<>(pEnd - pStart);
 
         // thread pool executor
-        for (int p = pStart; p <= pEnd; p++) {
-            results.add(executor.submit(new GibberishCallable(p, wCountMin, wCountMax)));
+        for (int paragraph = pStart; paragraph <= pEnd; paragraph++) {
+            String url = MessageFormat.format(gibberishUrl, paragraph, wCountMin, wCountMax);
+            results.add(executor.submit(new GibberishCallable(paragraph, url)));
         }
 
         // aggregate promises results

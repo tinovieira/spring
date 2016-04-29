@@ -14,7 +14,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import java.text.MessageFormat;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
@@ -24,15 +23,13 @@ public class GibberishCallable implements Callable<ComputationResult> {
 
     private static final Logger log = LoggerFactory.getLogger(GibberishCallable.class);
 
+    private String url;
     private int paragraph;
-    private int wCountMin;
-    private int wCountMax;
 
 
-    public GibberishCallable(int paragraph, Integer wCountMin, Integer wCountMax) {
+    public GibberishCallable(int paragraph, String url) {
+        this.url = url;
         this.paragraph = paragraph;
-        this.wCountMin = wCountMin;
-        this.wCountMax = wCountMax;
     }
 
     @Override
@@ -47,10 +44,7 @@ public class GibberishCallable implements Callable<ComputationResult> {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.USER_AGENT, "Spring REST");
 
-        String url = MessageFormat.format(
-                "http://www.randomtext.me/api/giberish/p-{0}/{1}-{2}", paragraph, wCountMin, wCountMax);
-        log.debug("GET " + url);
-
+        log.info("GET " + url);
         ResponseEntity<Gibberish> gibberish =
                 restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>("parameters", headers), Gibberish.class);
 
