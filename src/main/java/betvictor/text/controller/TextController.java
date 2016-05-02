@@ -1,24 +1,30 @@
 package betvictor.text.controller;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import betvictor.text.cuncurrency.GibberishCallable;
 import betvictor.text.dao.TextDao;
 import betvictor.text.entity.Text;
 import betvictor.text.pojo.ComputationResult;
 import betvictor.text.pojo.Word;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 /**
  * Rest Controller
@@ -29,13 +35,9 @@ public class TextController {
     private static final Logger log = LoggerFactory.getLogger(TextController.class);
 
     @Autowired
+    private ObjectFactory<GibberishCallable> gibberishCallableFactory;
+    @Autowired
     private TextDao textDao;
-
-    @Value("${gibberish.url}")
-    private String gibberishUrl;
-
-    @Value("${service.history.showLast}")
-    private int showHistoryLast;
 
     @RequestMapping("betvictor/text")
     public Text text(@RequestParam(value = "p_start") Integer pStart,
@@ -50,13 +52,14 @@ public class TextController {
         }
 
         // executor service
-        ExecutorService executor = Executors.newWorkStealingPool();
+        ExecutorService executor = Executors.newFixedThreadPool(8);
         List<Future<ComputationResult>> results = new ArrayList<>(pEnd - pStart);
 
         // thread pool executor
-        for (int paragraph = pStart; paragraph <= pEnd; paragraph++) {
-            String url = MessageFormat.format(gibberishUrl, paragraph, wCountMin, wCountMax);
-            results.add(executor.submit(new GibberishCallable(paragraph, url)));
+        for (int p = pStart; p <= pEnd; p++) {
+            GibberishCallable gibberishCallable = gibberishCallableFactory.getObject();
+            gibberishCallable.setup(p, wCountMin, wCountMax);
+            results.add(executor.submit(gibberishCallable));
         }
 
         // aggregate promises results
@@ -66,7 +69,7 @@ public class TextController {
         Map<String, Word> countMap = new HashMap<>();
 
         // iterate over promises
-        for (Future<ComputationResult> future: results) {
+        for (Future<ComputationResult> future : results) {
             try {
                 ComputationResult result = future.get();
                 totalParagraphs += result.getNumParagraphs();
@@ -74,7 +77,7 @@ public class TextController {
                 sumAverageProcessingParagraph += result.getAverageParagraphProcessingTime();
 
                 // aggregate word count results
-                for (Word object: result.getCountMap().values()) {
+                for (Word object : result.getCountMap().values()) {
                     String word = object.getWord();
                     Word wordObj = countMap.get(word);
                     if (wordObj == null) {
@@ -105,6 +108,6 @@ public class TextController {
 
     @RequestMapping("betvictor/history")
     public List<Text> history() {
-        return textDao.findLast(showHistoryLast);
+        return textDao.findLast(10);
     }
 }
