@@ -6,8 +6,8 @@ import java.util.List;
 
 public interface TextDao {
 
-    public void save(Text text);
+    void save(Text text);
 
-    public List<Text> findLast(int number);
+    List<Text> findLast(int number);
 
 }

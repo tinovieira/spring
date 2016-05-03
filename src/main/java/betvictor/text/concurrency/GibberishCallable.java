@@ -1,4 +1,4 @@
-package betvictor.text.cuncurrency;
+package betvictor.text.concurrency;
 
 import java.util.SortedSet;
 import java.util.StringTokenizer;
@@ -23,14 +23,14 @@ public class GibberishCallable implements Callable<ComputationResult> {
 
     private static final Logger log = LoggerFactory.getLogger(GibberishCallable.class);
 
-	@Autowired
-	private RandomTextService randomTextService;
+    @Autowired
+    private RandomTextService randomTextService;
 
     private int paragraph;
     private int wCountMin;
     private int wCountMax;
 
-	public void setup(int paragraph, Integer wCountMin, Integer wCountMax) {
+    public void setup(int paragraph, int wCountMin, int wCountMax) {
         this.paragraph = paragraph;
         this.wCountMin = wCountMin;
         this.wCountMax = wCountMax;
@@ -42,7 +42,7 @@ public class GibberishCallable implements Callable<ComputationResult> {
         ComputationResult result = new ComputationResult();
 
         long startTimeParagraph = System.currentTimeMillis();
-		Elements paragraphs = randomTextService.getGibberish(paragraph, wCountMin, wCountMax);
+        Elements paragraphs = randomTextService.getGibberish(paragraph, wCountMin, wCountMax);
 
         for (Element p : paragraphs) {
             String sentence = p.text().replace(".", "").toLowerCase();

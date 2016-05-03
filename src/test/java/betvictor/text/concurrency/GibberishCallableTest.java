@@ -1,4 +1,4 @@
-package betvictor.text.cuncurrency;
+package betvictor.text.concurrency;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;

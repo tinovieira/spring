@@ -1,6 +1,5 @@
 package betvictor.text.controller;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,11 +15,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import betvictor.text.cuncurrency.GibberishCallable;
+import betvictor.text.concurrency.GibberishCallable;
 import betvictor.text.dao.TextDao;
 import betvictor.text.entity.Text;
 import betvictor.text.pojo.ComputationResult;
@@ -36,8 +36,12 @@ public class TextController {
 
     @Autowired
     private ObjectFactory<GibberishCallable> gibberishCallableFactory;
+
     @Autowired
     private TextDao textDao;
+
+    @Value("history.last")
+    private int historyResults;
 
     @RequestMapping("betvictor/text")
     public Text text(@RequestParam(value = "p_start") Integer pStart,
@@ -108,6 +112,6 @@ public class TextController {
 
     @RequestMapping("betvictor/history")
     public List<Text> history() {
-        return textDao.findLast(10);
+        return textDao.findLast(historyResults);
     }
 }
