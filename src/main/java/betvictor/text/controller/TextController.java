@@ -51,6 +51,7 @@ public class TextController {
 
         long startTime = System.currentTimeMillis();
 
+        // validations
         if ((pStart <= 0 || pEnd < pStart) || (wCountMin <= 0 || wCountMax < wCountMin)) {
             return null;
         }
