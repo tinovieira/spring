@@ -40,7 +40,7 @@ public class TextController {
     @Autowired
     private TextDao textDao;
 
-    @Value("history.last")
+    @Value("${history.last}")
     private int historyResults;
 
     @RequestMapping("betvictor/text")
@@ -118,7 +118,7 @@ public class TextController {
         textDao.save(text);
 
         return text;
-    }
+    }\
 
     @RequestMapping("betvictor/history")
     public List<Text> history() {
