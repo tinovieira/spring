@@ -51,7 +51,7 @@ public class TextController {
 
         long startTime = System.currentTimeMillis();
 
-        if ((pStart <= 0 || pEnd <= pStart) || (wCountMin <= 0 || wCountMax <= wCountMin)) {
+        if ((pStart <= 0 || pEnd < pStart) || (wCountMin <= 0 || wCountMax < wCountMin)) {
             return null;
         }
 
@@ -98,8 +98,18 @@ public class TextController {
 
         SortedSet<Word> sortedWords = new TreeSet<>(countMap.values());
 
+        List<Word> mostFrequentWords = new ArrayList<>();
+        int maxWordCount = sortedWords.first().getCount();
+        for (Word word : sortedWords) {
+            if (word.getCount() == maxWordCount) {
+                mostFrequentWords.add(word);
+            } else {
+                break;
+            }
+        }
+
         Text text = new Text(
-                sortedWords.first().getWord(),
+                mostFrequentWords.size() > 1 ? "MULTIPLE" : mostFrequentWords.get(0).getWord(),
                 String.valueOf(totalWords / (double) totalParagraphs),
                 String.valueOf(sumAverageProcessingParagraph / totalParagraphs),
                 String.valueOf(System.currentTimeMillis() - startTime));
