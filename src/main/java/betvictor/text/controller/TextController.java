@@ -118,7 +118,7 @@ public class TextController {
         textDao.save(text);
 
         return text;
-    }\
+    }
 
     @RequestMapping("betvictor/history")
     public List<Text> history() {
